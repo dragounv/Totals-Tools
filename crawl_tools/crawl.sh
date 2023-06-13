@@ -20,6 +20,7 @@ if [ "$1" == "help" ]; then {
     usage_message
     echo ''
     echo 'Commands:'
+    echo '    ls - list crawlers and basic configuration'
     echo '    build -'
     echo '    launch - '
     echo '    pause - '
@@ -39,4 +40,24 @@ if [ -e settings_crawl.sh ] ; then {
     echo '    cp settings_crawl.template settings_crawlsh.sh'
     echo 'Exiting...'
     exit 1
+} fi
+
+# Define commands
+function ls {
+    i=0
+    for crawler in $crawlers; do {
+        (( i++ ))
+        echo "id: $(cut -d" " -f"$i" <<< "$crawler_id"), address: $crawler, port: $port"
+    } done
+}
+
+function pause {
+    for crawler in $crawlers; do {
+        echo "$crawler"
+    } done
+}
+
+# Temporary, use CASE later
+if [ "$1" == "ls" ]; then {
+    ls
 } fi

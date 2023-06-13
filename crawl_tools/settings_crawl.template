@@ -1,1 +1,5 @@
 # Example settings for crawl.sh script. If you want to use this file rename it to settings_crawl.sh
+
+crawlers='10.0.0.100 10.0.0.101 10.0.0.102'
+port='1234'
+crawler_id='0 1 2'
