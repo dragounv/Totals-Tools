@@ -1,2 +1,3 @@
 *.test
 tests
+settings_crawl.sh
