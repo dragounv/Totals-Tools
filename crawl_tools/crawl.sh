@@ -5,7 +5,7 @@
 
 function usage_message {
     echo 'usage: bash crawl.sh [command]'
-    echo 'use "bash crawl.sh help" for description'
+    echo 'use "bash crawl.sh help" for list of commands'
 }
 
 if [ "$#" != "1" ]; then {
@@ -44,20 +44,73 @@ if [ -e settings_crawl.sh ] ; then {
 
 # Define commands
 function ls {
-    i=0
-    for crawler in $crawlers; do {
-        (( i++ ))
-        echo "id: $(cut -d" " -f"$i" <<< "$crawler_id"), address: $crawler, port: $port"
+    for i in ${!crawlers[@]}; do {
+        echo "id: ${crawler_id[i]}, address: ${crawlers[i]}, port: $port"
     } done
 }
 
-function pause {
-    for crawler in $crawlers; do {
+function build {
+    echo "Building..."
+    for crawler in ${crawlers[@]}; do {
         echo "$crawler"
     } done
 }
 
-# Temporary, use CASE later
-if [ "$1" == "ls" ]; then {
-    ls
-} fi
+function launch {
+    echo "Launching..."
+    for crawler in ${crawlers[@]}; do {
+        echo "$crawler"
+    } done
+}
+
+function pause {
+    echo "Pausing..."
+    for crawler in ${crawlers[@]}; do {
+        echo "$crawler"
+    } done
+}
+
+function unpause {
+    echo "Resuming..."
+    for crawler in ${crawlers[@]}; do {
+        echo "$crawler"
+    } done
+}
+
+function terminate {
+    echo "Terminating..."
+    for crawler in ${crawlers[@]}; do {
+        echo "$crawler"
+    } done
+}
+
+function teardown {
+    echo "Cleaning..."
+    for crawler in ${crawlers[@]}; do {
+        echo "$crawler"
+    } done
+}
+
+function status {
+    first_i="y"
+    for crawler in ${crawlers[@]}; do {
+        [ "$first_i" != "y" ] && sleep "$delay" || first_i="n"
+        echo "------ Status for $crawler ------"
+        curl --no-progress-meter -k -u "$username":"$password" \
+        --anyauth --location -H "Accept: application/xml" https://"$crawler":"$port"/engine/job/"$job" |\
+        python3 ../xml_logs_to_csv.py '^<shortName>' '^<statusDescription>' '^<novel>' '^<total>'
+        # echo ''
+    } done
+}
+
+case "$1" in
+    ( "ls" ) ls;;
+    ( "build") build;;
+    ( "launch" ) launch;;
+    ( "pause" ) pause;;
+    ( "unpause" ) unpause;;
+    ( "terminate" ) terminate;;
+    ( "teardown" ) teardown;;
+    ( "status" ) status;;
+    ( * ) usage_message;;
+esac

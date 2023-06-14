@@ -19,6 +19,7 @@ search_pattern = search_pattern.removeprefix("|")
 re_pattern = re.compile(search_pattern)
 
 for line in sys.stdin:
+    line = line.lstrip()
     if re_pattern.search(line):
         l = line.removeprefix("<").removesuffix(">").split(">")
         try:

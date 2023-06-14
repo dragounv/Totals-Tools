@@ -1,0 +1,24 @@
+# Example settings for crawl.sh script. If you want to use this file rename it to settings_crawl.sh
+
+# Port number for Heritrix
+port='1234'
+
+# IP Adresses of crawlers
+# Use bash array!
+crawlers=("10.0.0.100" "10.0.0.101" "10.0.0.102" "10.0.0.103" "10.0.0.104" "10.0.0.105")
+
+# Crawler ids
+# Use bash array!
+crawler_id=("0" "1" "2" "3" "4" "5")
+
+# Heritrix username
+username='admin'
+
+# Heritrix password
+password='admin'
+
+# Job name
+job='Test-crawls'
+
+# Delay between requests sent to crawlers in seconds
+delay='2'
