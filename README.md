@@ -16,4 +16,4 @@ Python script, který podle regexů vytáhne z xml souboru vráceného heritrixe
 
 [] Script na průběžnou kontrolu stavu sklizně.
 
-[] Přidat script na konttrolu kvality.
+[] Přidat script na kontrolu kvality.
