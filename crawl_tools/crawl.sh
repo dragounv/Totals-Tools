@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Script for controlling several heritrix crawlers together
-# Can build, launch, unpase, pause, terminate and teardown using the heritrix api
+# Can build, launch, unpase, pause, terminate and teardown
+# using the heritrix api
 
 function usage_message {
     echo 'usage: bash crawl.sh [command]'
@@ -97,9 +98,10 @@ function status {
         [ "$first_i" != "y" ] && sleep "$delay" || first_i="n"
         echo "------ Status for $crawler ------"
         curl --no-progress-meter -k -u "$username":"$password" \
-        --anyauth --location -H "Accept: application/xml" https://"$crawler":"$port"/engine/job/"$job" |\
-        python3 ../xml_logs_to_csv.py '^<shortName>' '^<statusDescription>' '^<novel>' '^<total>'
-        # echo ''
+        --anyauth --location -H "Accept: application/xml" \
+        https://"$crawler":"$port"/engine/job/"$job" |\
+        python3 ../xml_logs_to_csv.py \
+        '^<shortName>' '^<statusDescription>' '^<novel>' '^<total>'
     } done
 }
 
