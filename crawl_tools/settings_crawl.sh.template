@@ -1,5 +1,8 @@
 # Example settings for crawl.sh script. If you want to use this file rename it to settings_crawl.sh
 
+# File where recieved xml responses will be directed
+log_file='responses.log'
+
 # Port number for Heritrix
 port='1234'
 

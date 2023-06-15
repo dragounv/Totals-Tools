@@ -1,3 +1,4 @@
 *.test
 tests
 settings_crawl.sh
+*.log
