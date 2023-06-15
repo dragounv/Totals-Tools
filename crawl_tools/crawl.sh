@@ -22,13 +22,13 @@ if [ "$1" == "help" ]; then {
     echo ''
     echo 'Commands:'
     echo '    ls - list crawlers and basic configuration'
-    echo '    build -'
-    echo '    launch - '
-    echo '    pause - '
-    echo '    unpause - '
+    echo '    build - build job configuration'
+    echo '    launch - launch job'
+    echo '    pause - pause job'
+    echo '    unpause | resume - resume job'
     echo '    terminate - '
     echo '    teardown - '
-    echo '    status - '
+    echo '    status - get crawler status'
     exit 0
 } fi
 
@@ -46,49 +46,98 @@ if [ -e settings_crawl.sh ] ; then {
 # Define commands
 function ls {
     for i in ${!crawlers[@]}; do {
-        echo "id: ${crawler_id[i]}, address: ${crawlers[i]}, port: $port"
+        echo "id: ${crawler_id[i]}, address: ${crawlers[i]}, port: $port,\
+ job: $job"
     } done
 }
 
 function build {
-    echo "Building..."
+    first_i="y"
     for crawler in ${crawlers[@]}; do {
-        echo "$crawler"
+        [ "$first_i" != "y" ] && sleep "$delay" || first_i="n"
+        echo "------ Building job configuration for $crawler ------" |\
+        tee -a "$log_file"
+        curl --no-progress-meter -d "action=build" \
+        -k -u "$username":"$password" \
+        --anyauth --location -H "Accept: application/xml" \
+        https://"$crawler":"$port"/engine/job/"$job" |\
+        tee -a "$log_file" |\
+        python3 ../xml_logs_to_csv.py '^<statusDescription>'
     } done
 }
 
 function launch {
-    echo "Launching..."
+    first_i="y"
     for crawler in ${crawlers[@]}; do {
-        echo "$crawler"
+        [ "$first_i" != "y" ] && sleep "$delay" || first_i="n"
+        echo "------ Launching job for $crawler ------" |\
+        tee -a "$log_file"
+        curl --no-progress-meter -d "action=launch" \
+        -k -u "$username":"$password" \
+        --anyauth --location -H "Accept: application/xml" \
+        https://"$crawler":"$port"/engine/job/"$job" |\
+        tee -a "$log_file" |\
+        python3 ../xml_logs_to_csv.py '^<statusDescription>'
     } done
 }
 
 function pause {
-    echo "Pausing..."
+    first_i="y"
     for crawler in ${crawlers[@]}; do {
-        echo "$crawler"
+        [ "$first_i" != "y" ] && sleep "$delay" || first_i="n"
+        echo "------ Puasing job for $crawler ------" |\
+        tee -a "$log_file"
+        curl --no-progress-meter -d "action=pause" \
+        -k -u "$username":"$password" \
+        --anyauth --location -H "Accept: application/xml" \
+        https://"$crawler":"$port"/engine/job/"$job" |\
+        tee -a "$log_file" |\
+        python3 ../xml_logs_to_csv.py '^<statusDescription>'
     } done
 }
 
 function unpause {
-    echo "Resuming..."
+    first_i="y"
     for crawler in ${crawlers[@]}; do {
-        echo "$crawler"
+        [ "$first_i" != "y" ] && sleep "$delay" || first_i="n"
+        echo "------ Resuming job for $crawler ------" |\
+        tee -a "$log_file"
+        curl --no-progress-meter -d "action=unpause" \
+        -k -u "$username":"$password" \
+        --anyauth --location -H "Accept: application/xml" \
+        https://"$crawler":"$port"/engine/job/"$job" |\
+        tee -a "$log_file" |\
+        python3 ../xml_logs_to_csv.py '^<statusDescription>'
     } done
 }
 
 function terminate {
-    echo "Terminating..."
+    first_i="y"
     for crawler in ${crawlers[@]}; do {
-        echo "$crawler"
+        [ "$first_i" != "y" ] && sleep "$delay" || first_i="n"
+        echo "------ Stoping job for $crawler ------" |\
+        tee -a "$log_file"
+        curl --no-progress-meter -d "action=terminate" \
+        -k -u "$username":"$password" \
+        --anyauth --location -H "Accept: application/xml" \
+        https://"$crawler":"$port"/engine/job/"$job" |\
+        tee -a "$log_file" |\
+        python3 ../xml_logs_to_csv.py '^<statusDescription>'
     } done
 }
 
 function teardown {
-    echo "Cleaning..."
+    first_i="y"
     for crawler in ${crawlers[@]}; do {
-        echo "$crawler"
+        [ "$first_i" != "y" ] && sleep "$delay" || first_i="n"
+        echo "------ Cleaning job configuration for $crawler ------" |\
+        tee -a "$log_file"
+        curl --no-progress-meter -d "action=teardown" \
+        -k -u "$username":"$password" \
+        --anyauth --location -H "Accept: application/xml" \
+        https://"$crawler":"$port"/engine/job/"$job" |\
+        tee -a "$log_file" |\
+        python3 ../xml_logs_to_csv.py '^<statusDescription>'
     } done
 }
 
@@ -96,12 +145,15 @@ function status {
     first_i="y"
     for crawler in ${crawlers[@]}; do {
         [ "$first_i" != "y" ] && sleep "$delay" || first_i="n"
-        echo "------ Status for $crawler ------"
+        echo "------ Status for $crawler ------" |\
+        tee -a "$log_file"
         curl --no-progress-meter -k -u "$username":"$password" \
         --anyauth --location -H "Accept: application/xml" \
         https://"$crawler":"$port"/engine/job/"$job" |\
+        tee -a "$log_file" |\
         python3 ../xml_logs_to_csv.py \
-        '^<shortName>' '^<statusDescription>' '^<novel>' '^<total>'
+        '^<statusDescription>' '^<novel>' '^<total>' '^<currentKiBPerSec>' \
+        '^<averageKiBPerSec>' '^<elapsedPretty>'
     } done
 }
 
@@ -110,7 +162,7 @@ case "$1" in
     ( "build") build;;
     ( "launch" ) launch;;
     ( "pause" ) pause;;
-    ( "unpause" ) unpause;;
+    ( "unpause" | "resume" ) unpause;;
     ( "terminate" ) terminate;;
     ( "teardown" ) teardown;;
     ( "status" ) status;;
